@@ -18,6 +18,7 @@ exports.storeUser = functions.auth.user().onCreate((user) => {
     name: user.displayName,
     email: user.email,
     photo_url: user.photoURL,
+    phone_number: user.phoneNumber,
     created_at: admin.firestore.Timestamp.now()
   }
 
