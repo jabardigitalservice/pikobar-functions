@@ -13,13 +13,20 @@ exports.helloWorld = functions.https.onRequest((request, response) => {
 exports.storeUser = functions.auth.user().onCreate((user) => {
   console.log('User:', user);
 
-  var record = user.toJSON()
-  record.createdAt = admin.firestore.Timestamp.now();
+  const record = {
+    id: user.uid,
+    name: user.displayName,
+    email: user.email,
+    photo_url: user.photoURL,
+    created_at: admin.firestore.Timestamp.now()
+  }
 
   admin.firestore()
     .collection(`users`)
     .doc(user.uid)
     .set(record);
+  
+  return 'ok';
 });
 
 exports.deleteUser = functions.auth.user().onDelete((user) => {
@@ -29,6 +36,8 @@ exports.deleteUser = functions.auth.user().onDelete((user) => {
     .collection(`users`)
     .doc(user.uid)
     .delete();
+  
+  return 'ok';
 });
 
 exports.autoSubscribeTopic = functions.firestore.document(`tokens/{tokenId}`).onCreate(async (snap, context) => {
@@ -38,4 +47,6 @@ exports.autoSubscribeTopic = functions.firestore.document(`tokens/{tokenId}`).on
   console.log('Token:', token);
 
   admin.messaging().subscribeToTopic(tokenId, 'general');
+
+  return 'ok';
 });
