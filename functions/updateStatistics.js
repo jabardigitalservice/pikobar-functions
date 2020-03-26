@@ -4,7 +4,7 @@ const axios = require('axios').default;
 
 exports.updateStatistics = functions.https.onRequest((request, response) => {
   axios.get('https://covid19-public.digitalservice.id/api/v1/rekapitulasi/jabar')
-        .then(function (res) {
+        .then(res => {
             const data = res.data.data.content;
             let lastUpdate = res.data.data.metadata.last_update;
             const milliseconds = lastUpdate ? new Date(lastUpdate).getTime() : Date.now();
@@ -43,9 +43,11 @@ exports.updateStatistics = functions.https.onRequest((request, response) => {
             .doc('test-cloud-function')
             .set(updatedStats, {merge: true});
 
-            response.json({"isSuccess": true});
+            const jsonRes = {"isSuccess": true};
+            response.json(jsonRes);
+            return jsonRes;
         })
-        .catch(function (error) {
+        .catch(error => {
             console.log(error);
             response.json({"isSuccess": false, "error": error});
         })
