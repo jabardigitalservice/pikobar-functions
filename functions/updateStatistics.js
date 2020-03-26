@@ -3,7 +3,7 @@ const admin = require('firebase-admin');
 const axios = require('axios').default;
 
 exports.updateStatistics = functions.https.onRequest((request, response) => {
-  axios.get('https://covid19-public.digitalservice.id/api/v1/rekapitulasi/jabar')
+  axios.get(functions.config().env.updateStatistics.apiURL)
         .then(res => {
             const data = res.data.data.content;
             let lastUpdate = res.data.data.metadata.last_update;
