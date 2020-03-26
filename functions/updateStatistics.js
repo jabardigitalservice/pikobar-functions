@@ -40,7 +40,7 @@ exports.updateStatistics = functions.https.onRequest((request, response) => {
 
             admin.firestore()
             .collection('statistics')
-            .doc('test-cloud-function')
+            .doc('jabar-dan-nasional')
             .set(updatedStats, {merge: true});
 
             const jsonRes = {"isSuccess": true};
