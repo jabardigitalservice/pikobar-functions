@@ -9,9 +9,7 @@ exports.updateStatistics = functions.https.onRequest((request, response) => {
         .then(function (res) {
             const data = res.data.data.content;
 
-            const lastUpdate = res.data.data.metadata.last_update ?
-              res.data.data.metadata.last_update :
-              Math.floor(Date.now() / 1000);
+            const lastUpdate = res.data.data.metadata.last_update;
 
             // console.log(data);
             const updatedStats = {
@@ -41,6 +39,10 @@ exports.updateStatistics = functions.https.onRequest((request, response) => {
                 }
               }
             };
+
+            if (lastUpdate) {
+              updatedStats['updated_at'] = lastUpdate;
+            }
 
             admin.firestore()
             .collection('statistics')
