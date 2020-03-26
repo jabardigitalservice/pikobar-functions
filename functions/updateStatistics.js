@@ -2,17 +2,15 @@ const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const axios = require('axios').default;
 
-admin.initializeApp();
-
 exports.updateStatistics = functions.https.onRequest((request, response) => {
   axios.get('https://covid19-public.digitalservice.id/api/v1/rekapitulasi/jabar')
         .then(function (res) {
             const data = res.data.data.content;
-
-            const lastUpdate = res.data.data.metadata.last_update;
-
-            // console.log(data);
+            let lastUpdate = res.data.data.metadata.last_update;
+            const milliseconds = lastUpdate ? new Date(lastUpdate).getTime() : Date.now();
+            lastUpdate = new admin.firestore.Timestamp(Math.floor(milliseconds / 1000), 0);
             const updatedStats = {
+              'updated_at': lastUpdate,
               'aktif': {
                 'jabar': data.positif
               },
@@ -39,10 +37,6 @@ exports.updateStatistics = functions.https.onRequest((request, response) => {
                 }
               }
             };
-
-            if (lastUpdate) {
-              updatedStats['updated_at'] = lastUpdate;
-            }
 
             admin.firestore()
             .collection('statistics')
