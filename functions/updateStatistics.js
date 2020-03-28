@@ -23,8 +23,6 @@ exports.updateStatistics =
       statistics = await getJabarStatistics(statistics);
       statistics = await getNationalStatistics(statistics);
       updateStatistics(statistics);
-      console.log('finish updating statistics')
-      response.send('ok');
     });
 
 
