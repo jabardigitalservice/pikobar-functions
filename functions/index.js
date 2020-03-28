@@ -1,5 +1,6 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
+const updateStatistics = require('./updateStatistics');
 
 admin.initializeApp();
 
@@ -29,7 +30,7 @@ exports.storeUser = functions.auth.user().onCreate((user) => {
     .collection(`users`)
     .doc(user.uid)
     .set(record);
-  
+
   return 'ok';
 });
 
@@ -40,7 +41,7 @@ exports.deleteUser = functions.auth.user().onDelete((user) => {
     .collection(`users`)
     .doc(user.uid)
     .delete();
-  
+
   return 'ok';
 });
 
@@ -54,3 +55,5 @@ exports.autoSubscribeTopic = functions.firestore.document(`tokens/{tokenId}`).on
 
   return 'ok';
 });
+
+exports.updateStatistics = updateStatistics.updateStatistics;
