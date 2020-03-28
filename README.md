@@ -16,7 +16,7 @@ https://firebase.google.com/docs/functions/local-emulator
 For example, we want to add a key-value pair named `myVar:myValue`.
 
 1. Edit `env.json`, add the key-value pair
-```json
+```
 {
    ..., //other key-value pairs
    "myVar": "myValue"
