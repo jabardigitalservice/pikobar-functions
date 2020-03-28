@@ -29,7 +29,7 @@ exports.updateStatistics =
 
 
 async function getJabarStatistics(updatedStatistics) {
-  return axios.get(functions.config().env.updateStatistics.apiURL)
+  return axios.get(functions.config().env.updateStatistics.jabarAPI)
     .then(res => {
         const data = res.data.data.content;
         let lastUpdate = res.data.data.metadata.last_update;
@@ -54,7 +54,7 @@ async function getJabarStatistics(updatedStatistics) {
 }
 
 async function getNationalStatistics(updatedStatistics) {
-  return axios.get('https://indonesia-covid-19.mathdro.id/api')
+  return axios.get(functions.config().env.updateStatistics.nationalAPI)
     .then(res => {
         const data = res.data;
         updatedStatistics.aktif.nasional = data.jumlahKasus;
@@ -72,6 +72,6 @@ async function getNationalStatistics(updatedStatistics) {
 function updateStatistics(statistics) {
   admin.firestore()
     .collection('statistics')
-    .doc('test-functions')
+    .doc('jabar-dan-nasional')
     .set(statistics, {merge: true});
 }
