@@ -11,6 +11,17 @@ exports.helloWorld = functions.https.onRequest((request, response) => {
  response.send("Hello from Firebase!");
 });
 
+exports.getUserById = functions.https.onRequest(async (request, response) => {
+  try {
+    const uid = request.query.id;
+    const userRecord = await admin.auth().getUser(uid)
+
+    response.send(userRecord.toJSON());
+  } catch (error) {
+    response.send("Error.");
+  }
+});
+
 exports.storeUser = functions.auth.user().onCreate((user) => {
   console.log('User:', user);
 
