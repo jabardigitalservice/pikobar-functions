@@ -67,4 +67,48 @@ exports.autoSubscribeTopic = functions.firestore.document(`tokens/{tokenId}`).on
   return 'ok';
 });
 
+exports.onBrodcastsCreated = functions.firestore.document(`broadcasts/{broadcastId}`).onCreate(async (snap, context) => {
+  const broadcastId = context.params.broadcastId;
+  console.log('broadcastId: ' + broadcastId);
+
+  const createUsersMessage = async (lastKey = '', iteration = 0, records = 0) => {
+      var db = admin.firestore();
+      var batch = db.batch();
+
+      const snapshots = await db.collection(`users`)
+        .orderBy('id')
+        .startAt(lastKey)
+        .limit(20)
+        .get();
+
+      var nextKey = null;
+      var counter = 0;
+
+      snapshots.forEach(snapshot => {
+        const userId = snapshot.data().id;
+
+        if (userId !== lastKey) {
+          counter++;
+
+          var message = snap.data();
+          message.read = false;
+          batch.set(snapshot.ref.collection(`messages`).doc(broadcastId), message);
+
+          nextKey = userId;
+        }
+      });
+
+      await batch.commit();
+
+      if (nextKey) {
+        await createUsersMessage(nextKey, iteration + 1, counter + records);
+      } else {
+        console.log(`Finished: ${iteration} iterations, ${counter + records} records created.`);
+      }
+  };
+
+  await createUsersMessage();
+  return 'ok';
+});
+
 exports.updateStatistics = updateStatistics.updateStatistics;
