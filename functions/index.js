@@ -14,9 +14,24 @@ exports.helloWorld = functions.https.onRequest((request, response) => {
 exports.getUserById = functions.https.onRequest(async (request, response) => {
   try {
     const uid = request.query.id;
-    const userRecord = await admin.auth().getUser(uid)
 
-    response.send(userRecord.toJSON());
+    const dbRecord = await admin.firestore()
+      .collection(`users`)
+      .doc(uid)
+      .get();
+
+    const dbData = dbRecord.data();
+
+    const userRecord = {
+      id: dbData.id,
+      name: dbData.name,
+      gender: dbData.gender,
+      photo_url: dbData.photo_url,
+      province_code: dbData.province_id,
+      city_code: dbData.city_id,
+    }
+
+    response.send(userRecord);
   } catch (error) {
     response.send("Error.");
   }
