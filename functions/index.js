@@ -2,6 +2,7 @@ const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const updateStatistics = require('./updateStatistics');
 const cors = require('cors')({origin: true});
+const axios = require('axios');
 
 admin.initializeApp();
 
@@ -33,9 +34,37 @@ exports.getUserById = functions.https.onRequest(async (request, response) => {
       city_code: dbData.city_id,
     }
 
-    response.send(userRecord);
+    return response.send(userRecord);
   } catch (error) {
-    response.send("Error.");
+    return response.status(500).send("Error.");
+  }
+});
+
+exports.postChatApiIncoming = functions.https.onRequest(async (request, response) => {
+  const requestData = request.body;
+  const requestToken = request.query.token;
+  const token = functions.config().chatapi.token;
+  const baseUrl = functions.config().chatapi.baseurl;
+  
+  try {
+    const chatId = requestData.messages[0].chatId;
+
+    axios({
+      method: 'post',
+      url: `${baseUrl}/sendMessage?token=${token}`,
+      data: {
+        chatId: chatId,
+        body: 'Ini adalah layanan notifikasi PIKOBAR Jawa Barat. Untuk informasi dan pertanyaan lebih lanjut, Anda bisa menghubungi Hotline Call Center kami di nomor WA 08112093306.\n\n' +
+        'Informasi tentang media edukasi dan situasi perkembangan COVID-19 di Jawa Barat, dapat diakses melalui:\n'+
+        'Hotline Dinas Kesehatan Provinsi Jawa Barat: 08112093306\n' +
+        'Website: https://pikobar.jabarprov.go.id\n' +
+        'Aplikasi Mobile: https://bit.ly/PIKOBAR-V1'
+      }
+    });
+
+    return response.send("OK");
+  } catch (error) {
+    return response.status(500).send("Error.");
   }
 });
 
