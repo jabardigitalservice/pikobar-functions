@@ -1,6 +1,7 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const updateStatistics = require('./updateStatistics');
+const cors = require('cors')({origin: true});
 
 admin.initializeApp();
 
@@ -26,6 +27,7 @@ exports.getUserById = functions.https.onRequest(async (request, response) => {
       id: dbData.id,
       name: dbData.name,
       gender: dbData.gender,
+      email: dbData.email,
       photo_url: dbData.photo_url,
       province_code: dbData.province_id,
       city_code: dbData.city_id,
