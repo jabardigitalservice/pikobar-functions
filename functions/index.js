@@ -48,23 +48,43 @@ exports.postChatApiIncoming = functions.https.onRequest(async (request, response
   
   try {
     const chatId = requestData.messages[0].chatId;
+    const fromMe = requestData.messages[0].fromMe;
 
-    axios({
+    if (fromMe === true) {
+      console.log("OK, Incoming from me. ChatID ", chatId);
+
+      return response.send("OK, Incoming from me. ChatID " + chatId);
+    }
+
+    await axios({
       method: 'post',
       url: `${baseUrl}/sendMessage?token=${token}`,
       data: {
         chatId: chatId,
-        body: 'Ini adalah layanan notifikasi PIKOBAR Jawa Barat. Untuk informasi dan pertanyaan lebih lanjut, Anda bisa menghubungi Hotline Call Center kami di nomor WA 08112093306.\n\n' +
-        'Informasi tentang media edukasi dan situasi perkembangan COVID-19 di Jawa Barat, dapat diakses melalui:\n'+
-        'Hotline Dinas Kesehatan Provinsi Jawa Barat: 08112093306\n' +
+        body: 'Ini adalah pesan otomatis layanan notifikasi PIKOBAR Pusat Informasi dan Koordinasi COVID-19 Jawa Barat. Untuk informasi dan pertanyaan lebih lanjut, Anda bisa menghubungi Hotline Call Center di nomor WA 08112093306\n\n' +
+        'Pertanyaan dan informasi situasi perkembangan COVID-19 di Jawa Barat, dapat diakses melalui:\n'+
+        'Whatsapp: 08112093306\n' +
         'Website: https://pikobar.jabarprov.go.id\n' +
-        'Aplikasi Mobile: https://bit.ly/PIKOBAR-V1'
+        'Aplikasi Android: https://bit.ly/PIKOBAR-V1'
       }
     });
 
-    return response.send("OK");
+    await axios({
+      method: 'post',
+      url: `${baseUrl}/sendVCard?token=${token}`,
+      data: {
+        chatId: chatId,
+        vcard: 'BEGIN:VCARD\nVERSION:3.0\nFN;CHARSET=UTF-8:Dinas Kesehatan Provinsi Jawa Barat\nN;CHARSET=UTF-8:;Dinas Kesehatan Provinsi Jawa Barat;;;\nTEL;TYPE=CELL:+628112093306\nTEL;TYPE=WORK,VOICE:119\nURL;CHARSET=UTF-8:https://pikobar.jabarprov.go.id\nNOTE;CHARSET=UTF-8:Hotline Call Center PIKOBAR Pusat Informasi dan Koordinasi COVID-19 Jawa Barat\nEND:VCARD'
+      }
+    });
+
+    console.log("OK. ChatID ", chatId);
+
+    return response.send("OK. ChatID " + chatId);
   } catch (error) {
-    return response.status(500).send("Error.");
+    console.log("Error. ChatID ", chatId);
+
+    return response.status(500).send("Error. ChatID "  + chatId);
   }
 });
 
