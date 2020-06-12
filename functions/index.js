@@ -26,9 +26,14 @@ exports.getUserById = functions.https.onRequest(async (request, response) => {
 
     const userRecord = {
       id: dbData.id,
+      email: dbData.email,
       name: dbData.name,
       gender: dbData.gender,
-      email: dbData.email,
+      location: dbData.location,
+      phone_number: dbData.phone_number,
+      birthdate: dbData.birthdate,
+      health_status: dbData.health_status,
+      address: dbData.address,
       photo_url: dbData.photo_url,
       province_code: dbData.province_id,
       city_code: dbData.city_id,
@@ -45,7 +50,7 @@ exports.postChatApiIncoming = functions.https.onRequest(async (request, response
   const requestToken = request.query.token;
   const token = functions.config().chatapi.token;
   const baseUrl = functions.config().chatapi.baseurl;
-  
+
   try {
     const chatId = requestData.messages[0].chatId;
     const fromMe = requestData.messages[0].fromMe;
