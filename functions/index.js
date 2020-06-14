@@ -62,9 +62,10 @@ exports.postChatApiIncoming = functions.https.onRequest(async (request, response
       url: `${baseUrl}/sendMessage?token=${token}`,
       data: {
         chatId: chatId,
-        body: 'Ini adalah pesan otomatis layanan notifikasi PIKOBAR Pusat Informasi dan Koordinasi COVID-19 Jawa Barat. Untuk informasi dan pertanyaan lebih lanjut, Anda bisa menghubungi Hotline Call Center di nomor WA 08112093306\n\n' +
+        body: 'Ini adalah pesan otomatis layanan notifikasi PIKOBAR Pusat Informasi dan Koordinasi COVID-19 Jawa Barat. Untuk informasi dan pertanyaan lebih lanjut, Anda bisa menghubungi Hotline Call Center di https://s.id/HotlinePikobar\n\n' +
         'Pertanyaan dan informasi situasi perkembangan COVID-19 di Jawa Barat, dapat diakses melalui:\n'+
-        'Whatsapp: 08112093306\n' +
+        'Pertanyaan Umum: https://s.id/ChatbotPikobar\n' +
+        'Whatsapp: https://s.id/HotlinePikobar\n' +
         'Website: https://pikobar.jabarprov.go.id\n' +
         'Aplikasi Android: https://bit.ly/PIKOBAR-V1'
       }
@@ -75,7 +76,7 @@ exports.postChatApiIncoming = functions.https.onRequest(async (request, response
       url: `${baseUrl}/sendVCard?token=${token}`,
       data: {
         chatId: chatId,
-        vcard: 'BEGIN:VCARD\nVERSION:3.0\nFN;CHARSET=UTF-8:Dinas Kesehatan Provinsi Jawa Barat\nN;CHARSET=UTF-8:;Dinas Kesehatan Provinsi Jawa Barat;;;\nTEL;TYPE=CELL:+628112093306\nTEL;TYPE=WORK,VOICE:119\nURL;CHARSET=UTF-8:https://pikobar.jabarprov.go.id\nNOTE;CHARSET=UTF-8:Hotline Call Center PIKOBAR Pusat Informasi dan Koordinasi COVID-19 Jawa Barat\nEND:VCARD'
+        vcard: 'BEGIN:VCARD\nVERSION:3.0\nFN;CHARSET=UTF-8:Hotline PIKOBAR Provinsi Jawa Barat\nN;CHARSET=UTF-8:;Hotline PIKOBAR Provinsi Jawa Barat;;;\nTEL;TYPE=CELL:+628112093306\nTEL;TYPE=WORK,VOICE:119\nURL;CHARSET=UTF-8:https://pikobar.jabarprov.go.id\nNOTE;CHARSET=UTF-8:Hotline Call Center PIKOBAR Pusat Informasi dan Koordinasi COVID-19 Jawa Barat\nEND:VCARD'
       }
     });
 
