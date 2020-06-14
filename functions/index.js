@@ -76,7 +76,7 @@ exports.postChatApiIncoming = functions.https.onRequest(async (request, response
       url: `${baseUrl}/sendVCard?token=${token}`,
       data: {
         chatId: chatId,
-        vcard: 'BEGIN:VCARD\nVERSION:3.0\nFN;CHARSET=UTF-8:Hotline PIKOBAR Provinsi Jawa Barat\nN;CHARSET=UTF-8:;Hotline PIKOBAR Provinsi Jawa Barat;;;\nTEL;TYPE=CELL:+628112093306\nTEL;TYPE=WORK,VOICE:119\nURL;CHARSET=UTF-8:https://pikobar.jabarprov.go.id\nNOTE;CHARSET=UTF-8:Hotline Call Center PIKOBAR Pusat Informasi dan Koordinasi COVID-19 Jawa Barat\nEND:VCARD'
+        vcard: 'BEGIN:VCARD\nVERSION:3.0\nFN;CHARSET=UTF-8:PIKOBAR Provinsi Jawa Barat\nN;CHARSET=UTF-8:;PIKOBAR Provinsi Jawa Barat;;;\nTEL;TYPE=CELL:+628112093306\nTEL;TYPE=CELL:+6282117745875\nTEL;TYPE=CELL:+6285697391854\nURL;CHARSET=UTF-8:https://pikobar.jabarprov.go.id\nNOTE;CHARSET=UTF-8:Hotline Call Center PIKOBAR Pusat Informasi dan Koordinasi Jawa Barat\nEND:VCARD'
       }
     });
 
