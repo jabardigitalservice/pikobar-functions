@@ -8,7 +8,6 @@ exports.updateStatistics =
     .onRun(async context => {
       let statistics = {
         'updated_at': null,
-        // 'confirmed': {},
         'aktif': {},
         'sembuh': {},
         'meninggal': {},
@@ -61,7 +60,6 @@ async function getNationalStatistics(updatedStatistics) {
         const fatal = data.numbers.fatal;
         const activeCases = infected - (recovered + fatal);
 
-        // updatedStatistics.confirmed.nasional = infected;
         updatedStatistics.aktif.nasional = infected;
         updatedStatistics.sembuh.nasional = recovered;
         updatedStatistics.meninggal.nasional = fatal;
