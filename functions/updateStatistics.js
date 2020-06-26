@@ -55,9 +55,14 @@ async function getNationalStatistics(updatedStatistics) {
   return axios.get(functions.config().env.updateStatistics.nationalAPI)
     .then(res => {
         const data = res.data;
-        updatedStatistics.aktif.nasional = data.jumlahKasus;
-        updatedStatistics.sembuh.nasional = data.sembuh;
-        updatedStatistics.meninggal.nasional = data.meninggal;
+        const infected = data.numbers.infected;
+        const recovered = data.numbers.recovered;
+        const fatal = data.numbers.fatal;
+        const activeCases = infected - (recovered + fatal);
+
+        updatedStatistics.aktif.nasional = infected;
+        updatedStatistics.sembuh.nasional = recovered;
+        updatedStatistics.meninggal.nasional = fatal;
 
         return updatedStatistics;
     })
