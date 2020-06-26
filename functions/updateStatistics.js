@@ -3,7 +3,7 @@ const admin = require('firebase-admin');
 const axios = require('axios').default;
 
 exports.updateStatistics =
-  functions.pubsub.schedule('every 30 minutes')
+  functions.pubsub.schedule('every 6 hours')
     .timeZone('Asia/Jakarta')
     .onRun(async context => {
       let statistics = {
