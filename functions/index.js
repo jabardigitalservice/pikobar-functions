@@ -141,3 +141,4 @@ exports.updateStatistics = updateStatistics.updateStatistics;
 
 exports.selfReportManageSubscriptions = selfReport.selfReportManageSubscriptions;
 exports.selfReportAutoUnsubscribe = selfReport.selfReportAutoUnsubscribe;
+exports.selfReportScheduledNotification = selfReport.selfReportScheduledNotification;
