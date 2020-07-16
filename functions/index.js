@@ -3,6 +3,7 @@ const admin = require('firebase-admin');
 const updateStatistics = require('./updateStatistics');
 const cors = require('cors')({origin: true});
 const axios = require('axios');
+const selfReport = require('./self-report-notification');
 
 admin.initializeApp();
 
@@ -136,3 +137,7 @@ exports.autoSubscribeTopic = functions.firestore.document(`tokens/{tokenId}`).on
 });
 
 exports.updateStatistics = updateStatistics.updateStatistics;
+
+
+exports.selfReportManageSubscriptions = selfReport.selfReportManageSubscriptions;
+exports.selfReportAutoUnsubscribe = selfReport.selfReportAutoUnsubscribe;
