@@ -132,3 +132,43 @@ exports.selfReportAutoUnsubscribe = functions.firestore.document('self_reports/{
 
     return 'ok';
 });
+
+/**
+ * Send scheduled self report notifications.
+ * 
+ * This will be run every day at 07:00 WIB.
+ */
+exports.selfReportScheduledNotification = functions.pubsub.schedule('0 7 * * *').timeZone('Asia/Jakarta').onRun((context) => {
+
+    console.log('Send scheduled self reports notifications');
+
+    // The message payload.
+    const payload = {
+        notification: {
+            title: "👩🏻‍⚕️Sudahkah Anda lapor kesehatan Anda hari ini?",
+            body: "Laporkan kesehatan harian Anda di menu Lapor Mandiri sekarang."
+        },
+        data: {
+            click_action: "FCM_PLUGIN_ACTIVITY",
+            target: "self_reports",
+        }
+    };
+
+    // Optional options to alter the message.
+    const options = {
+        priority: "high",
+        timeToLive: 60 * 60 * 24
+    };
+
+
+    // Send a message to devices subscribed to the provided topic.
+    admin.messaging().sendToTopic(topic, payload, options)
+        .then(function(response) {
+            console.log("Successfully sent message:", response);
+        })
+        .catch(function(error) {
+            console.log("Error sending message:", error);
+        });
+
+    return null;
+});
