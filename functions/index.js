@@ -4,6 +4,7 @@ const updateStatistics = require('./updateStatistics');
 const cors = require('cors')({origin: true});
 const axios = require('axios');
 const selfReport = require('./self-report-notification');
+const selfReportExcel = require('./self-report-excel');
 
 admin.initializeApp();
 
@@ -142,3 +143,5 @@ exports.updateStatistics = updateStatistics.updateStatistics;
 exports.selfReportManageSubscriptions = selfReport.selfReportManageSubscriptions;
 exports.selfReportAutoUnsubscribe = selfReport.selfReportAutoUnsubscribe;
 exports.selfReportScheduledNotification = selfReport.selfReportScheduledNotification;
+
+exports.selfReportGetExcel = selfReportExcel.selfReportGetExcel;
