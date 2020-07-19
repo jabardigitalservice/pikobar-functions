@@ -8,29 +8,22 @@ exports.selfReportGetExcel = functions.https.onRequest(async (request, response)
     try {
       const uid = request.query.id;
 
-      const dbRecord = await admin.firestore()
-        .collection(`users`)
+      const dailyReports = await admin.firestore()
+        .collection(`self_reports`)
         .doc(uid)
+        .collection(`daily_report`)
         .get();
 
-      const dbData = dbRecord.data();
+      const result = [];
 
-      const userRecord = {
-        id: dbData.id,
-        email: dbData.email,
-        name: dbData.name,
-        gender: dbData.gender,
-        location: dbData.location,
-        phone_number: dbData.phone_number,
-        birthdate: dbData.birthdate,
-        health_status: dbData.health_status,
-        address: dbData.address,
-        photo_url: dbData.photo_url,
-        province_code: dbData.province_id,
-        city_code: dbData.city_id,
-      }
+      dailyReports.forEach(report =>{
+        const reportId = report.id;
+        result.push({
+            [reportId]: report.data()
+        });
+      })
 
-      return response.send(userRecord);
+      return response.send(result);
     } catch (error) {
       return response.status(500).send("Error.");
     }
