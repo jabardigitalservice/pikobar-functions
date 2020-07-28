@@ -3,7 +3,7 @@ const admin = require('firebase-admin');
 const axios = require('axios').default;
 
 exports.updateStatistics =
-  functions.pubsub.schedule('0 * * * *')
+  functions.pubsub.schedule('*/10 * * * *')
     .timeZone('Asia/Jakarta')
     .onRun(async context => {
       const { data } = await axios.get('https://pikobar-api-static.digitalservice.id/v2/covid-cases')
