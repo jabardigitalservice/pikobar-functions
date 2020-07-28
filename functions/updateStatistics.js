@@ -3,9 +3,12 @@ const admin = require('firebase-admin');
 const axios = require('axios').default;
 
 exports.updateStatistics =
-  functions.pubsub.schedule('every 5 minutes')
+  functions.pubsub.schedule('0 * * * *')
     .timeZone('Asia/Jakarta')
     .onRun(async context => {
+      const { data } = await axios.get('https://pikobar-api-static.digitalservice.id/v2/covid-cases')
+      console.log(data)
+
       let statistics = {
         'updated_at': null,
         'aktif': {},
@@ -20,57 +23,27 @@ exports.updateStatistics =
           'total': {}
         }
       };
-      statistics = await getJabarStatistics(statistics);
-      statistics = await getNationalStatistics(statistics);
+      
+      // jawabarat
+      statistics['aktif']['jabar'] = data['jawabarat']['positif_total']
+      statistics['sembuh']['jabar'] = data['jawabarat']['positif_sembuh']
+      statistics['meninggal']['jabar'] = data['jawabarat']['positif_meninggal']
+
+      statistics['odp']['selesai']['jabar'] = data['jawabarat']['odp_selesai']
+      statistics['odp']['total']['jabar'] = data['jawabarat']['odp_total']
+      statistics['pdp']['selesai']['jabar'] = data['jawabarat']['pdp_selesai']
+      statistics['pdp']['total']['jabar'] = data['jawabarat']['pdp_total']
+
+      // nasional
+      statistics['aktif']['nasional'] = data['nasional']['positif_total']
+      statistics['sembuh']['nasional'] = data['nasional']['positif_sembuh']
+      statistics['meninggal']['nasional'] = data['nasional']['positif_meninggal']
+
+      const last_update = new Date(data['meta']['last_update']);
+      statistics['updated_at'] = admin.firestore.Timestamp.fromDate(last_update);
+
       updateStatistics(statistics);
     });
-
-
-async function getJabarStatistics(updatedStatistics) {
-  return axios.get(functions.config().env.updateStatistics.jabarAPI)
-    .then(res => {
-        const data = res.data.data.content;
-        let lastUpdate = res.data.data.metadata.last_update;
-        const milliseconds = lastUpdate ? new Date(lastUpdate).getTime() : Date.now();
-        lastUpdate = new admin.firestore.Timestamp(Math.floor(milliseconds / 1000), 0);
-
-        updatedStatistics.updated_at = lastUpdate;
-        updatedStatistics.aktif.jabar = data.positif;
-        updatedStatistics.sembuh.jabar = data.sembuh;
-        updatedStatistics.meninggal.jabar = data.meninggal;
-        updatedStatistics.odp.selesai.jabar = data.odp_selesai;
-        updatedStatistics.odp.total.jabar = data.odp_total;
-        updatedStatistics.pdp.selesai.jabar = data.pdp_selesai;
-        updatedStatistics.pdp.total.jabar = data.pdp_total;
-
-        return updatedStatistics;
-    })
-    .catch(error => {
-        console.log(error);
-        return (error);
-    })
-}
-
-async function getNationalStatistics(updatedStatistics) {
-  return axios.get(functions.config().env.updateStatistics.nationalAPI)
-    .then(res => {
-        const data = res.data;
-        const infected = data.numbers.infected;
-        const recovered = data.numbers.recovered;
-        const fatal = data.numbers.fatal;
-        const activeCases = infected - (recovered + fatal);
-
-        updatedStatistics.aktif.nasional = infected;
-        updatedStatistics.sembuh.nasional = recovered;
-        updatedStatistics.meninggal.nasional = fatal;
-
-        return updatedStatistics;
-    })
-    .catch(error => {
-        console.log(error);
-        return (error);
-    })
-}
 
 function updateStatistics(statistics) {
   admin.firestore()
