@@ -24,6 +24,25 @@ exports.updateStatistics =
         }
       };
       
+      let prc = {
+        'last_update': null,
+        'invalid': null,
+        'negatif': null,
+        'positif': null,
+        'total': null
+      }
+
+      let rdt = {
+        'last_update': null,
+        'invalid': null,
+        'negatif': null,
+        'positif': null,
+        'total': null
+      }
+
+      const last_update = new Date(data['meta']['last_update']);
+      const formated_last_update = admin.firestore.Timestamp.fromDate(last_update);
+
       // jawabarat
       statistics['aktif']['jabar'] = data['jawabarat']['positif_total']
       statistics['sembuh']['jabar'] = data['jawabarat']['positif_sembuh']
@@ -39,15 +58,38 @@ exports.updateStatistics =
       statistics['sembuh']['nasional'] = data['nasional']['positif_sembuh']
       statistics['meninggal']['nasional'] = data['nasional']['positif_meninggal']
 
-      const last_update = new Date(data['meta']['last_update']);
-      statistics['updated_at'] = admin.firestore.Timestamp.fromDate(last_update);
+      statistics['updated_at'] = formated_last_update;
 
-      updateStatistics(statistics);
-    });
+      // pcr
+      prc['invalid'] = data['jawabarat']['pcr_invalid']
+      prc['negatif'] = data['jawabarat']['pcr_negatif']
+      prc['positif'] = data['jawabarat']['pcr_positif']
+      prc['total'] = data['jawabarat']['pcr_total']
+      prc['last_update'] = formated_last_update;
 
-function updateStatistics(statistics) {
+      // rdt
+      rdt['invalid'] = data['jawabarat']['rdt_invalid']
+      rdt['negatif'] = data['jawabarat']['rdt_negatif']
+      rdt['positif'] = data['jawabarat']['rdt_positif']
+      rdt['total'] = data['jawabarat']['rdt_total']
+      rdt['last_update'] = formated_last_update;
+
+      updateStatistics(statistics, prc, rdt);
+  });
+
+function updateStatistics(statistics, pcr, rdt) {
   admin.firestore()
     .collection('statistics')
     .doc('jabar-dan-nasional')
     .set(statistics, {merge: true});
+
+  admin.firestore()
+    .collection('statistics')
+    .doc('pcr')
+    .set(pcr, {merge: true});
+
+  admin.firestore()
+    .collection('statistics')
+    .doc('rdt')
+    .set(rdt, {merge: true});
 }
