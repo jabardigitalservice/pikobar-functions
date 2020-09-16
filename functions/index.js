@@ -160,13 +160,13 @@ exports.updateProfileTracking = functions.firestore.document('users/{userId}').o
     phone: String(newValue.phone_number),
     stay_at_province: String(newValue.province_id),
     stay_at_city: String(newValue.city_id),
-    birthday: (typeof newValue.birthdate !== 'undefined' && newValue.birthdate) ? newValue.birthdate.toDate().toISOString() : 'undefined',
+    birthday: (typeof newValue.birthdate !== 'undefined' && newValue.birthdate) ? newValue.birthdate.toDate().toISOString() : null,
     status: String(newValue.health_status)
   }
 
-  // Performs a PATCH request to update user profile data in the tracking dashboard
+  // Performs a PUT request to update user profile data in the tracking dashboard
   await axios({
-    method: 'PATCH',
+    method: 'PUT',
     url: profileUrl,
     data: record
   }).then(response => console.log(response.status))
