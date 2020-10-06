@@ -6,7 +6,16 @@ exports.updateStatistics =
     functions.pubsub.schedule('*/10 * * * *')
     .timeZone('Asia/Jakarta')
     .onRun(async context => {
-        const { data } = await axios.get('https://pikobar-api-static.digitalservice.id/v2/covid-cases-new')
+
+        const baseUrl = functions.config().env.updateStatistics.pikobarAPI.baseUrl;
+        const apiKey = functions.config().env.updateStatistics.pikobarAPI.apiKey;
+
+        const { data } = await axios.get(baseUrl, {
+            headers: {
+                'api-key': apiKey
+            }
+        })
+
         console.log(data)
 
         let statistics = {
@@ -19,7 +28,7 @@ exports.updateStatistics =
             'suspek': {}
         };
 
-        let prc = {
+        let pcr = {
             'last_update': null,
             'invalid': null,
             'negatif': null,
@@ -35,44 +44,40 @@ exports.updateStatistics =
             'total': null
         }
 
-        const last_update = new Date(data['meta']['last_update']);
+        const last_update = new Date(data['metadata']['last_update']);
         const formated_last_update = admin.firestore.Timestamp.fromDate(last_update);
 
+        const datas = data['data'][0];
+
         // jawabarat
-        statistics['aktif']['jabar'] = data['jawabarat']['confirmation_total']
-        statistics['sembuh']['jabar'] = data['jawabarat']['confirmation_selesai']
-        statistics['meninggal']['jabar'] = data['jawabarat']['confirmation_meninggal']
+        statistics['aktif']['jabar'] = datas['confirmation_total']
+        statistics['sembuh']['jabar'] = datas['confirmation_selesai']
+        statistics['meninggal']['jabar'] = datas['confirmation_meninggal']
 
-        statistics['kontak_erat']['karantina'] = data['jawabarat']['closecontact_dikarantina']
-        statistics['kontak_erat']['total'] = data['jawabarat']['closecontact_total']
-        statistics['probable']['isolasi'] = data['jawabarat']['probable_diisolasi']
-        statistics['probable']['selesai'] = data['jawabarat']['probable_discarded']
-        statistics['probable']['total'] = data['jawabarat']['probable_total']
-        statistics['suspek']['isolasi'] = data['jawabarat']['suspect_diisolasi']
-        statistics['suspek']['total'] = data['jawabarat']['suspect_total']
-
-        // nasional
-        statistics['aktif']['nasional'] = data['nasional']['positif_total']
-        statistics['sembuh']['nasional'] = data['nasional']['positif_sembuh']
-        statistics['meninggal']['nasional'] = data['nasional']['positif_meninggal']
-
+        statistics['kontak_erat']['karantina'] = datas['closecontact_dikarantina']
+        statistics['kontak_erat']['total'] = datas['closecontact_total']
+        statistics['probable']['isolasi'] = datas['probable_diisolasi']
+        statistics['probable']['selesai'] = datas['probable_discarded']
+        statistics['probable']['total'] = datas['probable_total']
+        statistics['suspek']['isolasi'] = datas['suspect_diisolasi']
+        statistics['suspek']['total'] = datas['suspect_total']
         statistics['updated_at'] = formated_last_update;
 
         // pcr
-        prc['invalid'] = data['jawabarat']['pcr_invalid']
-        prc['negatif'] = data['jawabarat']['pcr_negatif']
-        prc['positif'] = data['jawabarat']['pcr_positif']
-        prc['total'] = data['jawabarat']['pcr_total']
-        prc['last_update'] = formated_last_update;
+        pcr['invalid'] = datas['pcr_invalid']
+        pcr['negatif'] = datas['pcr_negatif']
+        pcr['positif'] = datas['pcr_positif']
+        pcr['total'] = datas['pcr_total']
+        pcr['last_update'] = formated_last_update;
 
         // rdt
-        rdt['invalid'] = data['jawabarat']['rdt_invalid']
-        rdt['negatif'] = data['jawabarat']['rdt_negatif']
-        rdt['positif'] = data['jawabarat']['rdt_positif']
-        rdt['total'] = data['jawabarat']['rdt_total']
+        rdt['invalid'] = datas['rdt_invalid']
+        rdt['negatif'] = datas['rdt_negatif']
+        rdt['positif'] = datas['rdt_positif']
+        rdt['total'] = datas['rdt_total']
         rdt['last_update'] = formated_last_update;
 
-        updateStatistics(statistics, prc, rdt);
+        updateStatistics(statistics, pcr, rdt);
     });
 
 function updateStatistics(statistics, pcr, rdt) {
