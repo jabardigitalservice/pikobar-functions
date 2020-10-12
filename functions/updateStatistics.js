@@ -3,7 +3,7 @@ const admin = require('firebase-admin');
 const axios = require('axios').default;
 
 exports.updateStatistics =
-    functions.pubsub.schedule('*/10 * * * *')
+    functions.pubsub.schedule('*/30 * * * *')
     .timeZone('Asia/Jakarta')
     .onRun(async context => {
 
@@ -44,8 +44,8 @@ exports.updateStatistics =
             'total': null
         }
 
-        const last_update = new Date(data['metadata']['last_update']);
-        const formated_last_update = admin.firestore.Timestamp.fromDate(last_update);
+        // const last_update = new Date(data['metadata']['last_update']);
+        const formated_last_update = admin.firestore.Timestamp.now();
 
         const datas = data['data'][0];
 
