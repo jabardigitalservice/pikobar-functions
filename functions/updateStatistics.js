@@ -44,42 +44,42 @@ exports.updateStatistics =
                 'total': null
             }
 
-            const datas = data['data'][0];
+            const field = data['data'][0];
 
             // const last_update = new Date(data['metadata']['last_update']);
-            const pcr_update = new Date(datas['pcr_date']);
-            const rdt_update = new Date(datas['rdt_tanggal']);
+            const pcr_update = new Date(field['pcr_date']);
+            const rdt_update = new Date(field['rdt_tanggal']);
             const formated_last_update = admin.firestore.Timestamp.now();
             const formated_pcr_update = admin.firestore.Timestamp.fromDate(pcr_update);
             const formated_rdt_update = admin.firestore.Timestamp.fromDate(rdt_update);
 
 
             // jawabarat
-            statistics['aktif']['jabar'] = datas['confirmation_total']
-            statistics['sembuh']['jabar'] = datas['confirmation_selesai']
-            statistics['meninggal']['jabar'] = datas['confirmation_meninggal']
+            statistics['aktif']['jabar'] = field['confirmation_total']
+            statistics['sembuh']['jabar'] = field['confirmation_selesai']
+            statistics['meninggal']['jabar'] = field['confirmation_meninggal']
 
-            statistics['kontak_erat']['karantina'] = datas['closecontact_dikarantina']
-            statistics['kontak_erat']['total'] = datas['closecontact_total']
-            statistics['probable']['isolasi'] = datas['probable_diisolasi']
-            statistics['probable']['selesai'] = datas['probable_discarded']
-            statistics['probable']['total'] = datas['probable_total']
-            statistics['suspek']['isolasi'] = datas['suspect_diisolasi']
-            statistics['suspek']['total'] = datas['suspect_total']
+            statistics['kontak_erat']['karantina'] = field['closecontact_dikarantina']
+            statistics['kontak_erat']['total'] = field['closecontact_total']
+            statistics['probable']['isolasi'] = field['probable_diisolasi']
+            statistics['probable']['selesai'] = field['probable_discarded']
+            statistics['probable']['total'] = field['probable_total']
+            statistics['suspek']['isolasi'] = field['suspect_diisolasi']
+            statistics['suspek']['total'] = field['suspect_total']
             statistics['updated_at'] = formated_last_update;
 
             // pcr
-            pcr['invalid'] = datas['pcr_invalid']
-            pcr['negatif'] = datas['pcr_negatif']
-            pcr['positif'] = datas['pcr_positif']
-            pcr['total'] = datas['pcr_total']
+            pcr['invalid'] = field['pcr_invalid']
+            pcr['negatif'] = field['pcr_negatif']
+            pcr['positif'] = field['pcr_positif']
+            pcr['total'] = field['pcr_total']
             pcr['last_update'] = formated_pcr_update;
 
             // rdt
-            rdt['invalid'] = datas['rdt_invalid']
-            rdt['negatif'] = datas['rdt_negatif']
-            rdt['positif'] = datas['rdt_positif']
-            rdt['total'] = datas['rdt_total']
+            rdt['invalid'] = field['rdt_invalid']
+            rdt['negatif'] = field['rdt_negatif']
+            rdt['positif'] = field['rdt_positif']
+            rdt['total'] = field['rdt_total']
             rdt['last_update'] = formated_rdt_update;
 
             updateStatistics(statistics, pcr, rdt);
