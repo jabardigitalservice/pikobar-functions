@@ -16,8 +16,6 @@ exports.updateStatistics =
                 }
             })
 
-            console.log(data)
-
             let statistics = {
                 'updated_at': null,
                 'aktif': {},
