@@ -4,6 +4,7 @@ const updateStatistics = require('./updateStatistics');
 const cors = require('cors')({origin: true});
 const axios = require('axios');
 const selfReport = require('./self-report-notification');
+const locationTracking = require('./location-tracking');
 
 admin.initializeApp();
 
@@ -181,3 +182,5 @@ exports.updateStatistics = updateStatistics.updateStatistics;
 exports.selfReportManageSubscriptions = selfReport.selfReportManageSubscriptions;
 exports.selfReportAutoUnsubscribe = selfReport.selfReportAutoUnsubscribe;
 exports.selfReportScheduledNotification = selfReport.selfReportScheduledNotification;
+
+exports.locationTracking = locationTracking.locationTracking;
