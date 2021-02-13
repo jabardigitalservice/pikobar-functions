@@ -3,6 +3,7 @@ const admin = require('firebase-admin');
 const updateStatistics = require('./updateStatistics');
 const cors = require('cors')({origin: true});
 const axios = require('axios');
+const selfReportTest = require('./self-report');
 const selfReport = require('./self-report-notification');
 const locationTracking = require('./location-tracking');
 
@@ -177,6 +178,8 @@ exports.updateProfileTracking = functions.firestore.document('users/{userId}').o
 });
 
 exports.updateStatistics = updateStatistics.updateStatistics;
+
+exports.selfReportTestPubSub = selfReportTest.testPubSub;
 
 
 exports.selfReportManageSubscriptions = selfReport.selfReportManageSubscriptions;

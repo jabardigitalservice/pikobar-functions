@@ -1,5 +1,6 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
+const { PubSub } = require('@google-cloud/pubsub');
 
 /**
  * Stores location data sent from the user's device.
@@ -25,7 +26,7 @@ const admin = require('firebase-admin');
  * }
  * 
  */
-exports.locationTracking = functions.https.onRequest((req, res) => {
+exports.locationTracking = functions.https.onRequest(async (req, res) => {
     if (req.get('content-type').includes('application/json')) {
         const requestData = req.body;
         const userId = requestData.userId;
@@ -51,8 +52,32 @@ exports.locationTracking = functions.https.onRequest((req, res) => {
             userLocations.add(data);
         }
 
-        res.status(200).send('Recorded');
+
+        /**
+         * Pub/Sub Update Location Tracking Topic
+         */
+
+        // Init Pub/Sub client
+        const pubSubClient = new PubSub();
+
+        // Pub/Sub topic
+        const topicName = functions.config().env.tracking.pubsub_topic;
+        
+        // Convert message data to json string
+        messageData = JSON.stringify(requestData);
+        const messageDataBuffer = Buffer.from(messageData);
+
+        // Publish to Pub/Sub
+        try {
+            const messageId = await pubSubClient.topic(topicName).publish(messageDataBuffer);
+            console.log(`Message ${topicName} - ${messageId} published.`);
+        } catch (error) {
+            console.error(`Received error while publishing: ${topicName} - ${error.message}`);
+            return res.status(500).send("Error pub/sub publish message.");
+        }
+
+        return res.status(200).send('Recorded');
     } else {
-        res.status(400).send(`Content type not allowed`);
+        return res.status(400).send(`Content type not allowed`);
     }
 });
