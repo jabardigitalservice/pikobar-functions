@@ -63,9 +63,20 @@ exports.locationTracking = functions.https.onRequest(async (req, res) => {
         // Pub/Sub topic
         const topicName = functions.config().env.tracking.pubsub_topic;
         
+        // Prepare message data
+        // Add user data
+        const userRef = admin.firestore()
+            .collection('users')
+            .doc(userId);
+
+        const userData = (await userRef.get()).data();
+        requestData.user = userData
+        
         // Convert message data to json string
         messageData = JSON.stringify(requestData);
         const messageDataBuffer = Buffer.from(messageData);
+
+        console.log(`Location Tracking updated: ${messageData}`);
 
         // Publish to Pub/Sub
         try {
