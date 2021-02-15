@@ -45,6 +45,7 @@ exports.selfReportCreatedPubsub = functions.firestore.document('self_reports/{us
 
     // Prepare pub/sub message data
     const pubData = {
+        report_id: id,
         user_id: userId,
         action: "create",
         created_at: newValue.created_at,
