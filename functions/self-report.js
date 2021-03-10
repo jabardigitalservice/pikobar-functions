@@ -32,24 +32,48 @@ exports.selfReportCreatedPubsub = functions.firestore.document('self_reports/{us
         user: userData,
     };
 
-    // Init Pub/Sub client
-    const pubSubClient = new PubSub();
+    const result = publishMessageTopic(pubData);
 
-    // Pub/Sub topic
-    const topicName = functions.config().env.self_report.pubsub_topic;
+    if (result === false) {
+        return 'error';
+    }
 
-    // Convert message data to json string
-    messageJsonString = JSON.stringify(pubData);
-    const messageBuffer = Buffer.from(messageJsonString);
+    return 'ok';
+});
 
-    console.log(`Self Report Pub/Sub message data: ${messageJsonString}`);
+exports.selfReportUpdatedPubsub = functions.firestore.document('self_reports/{userId}/daily_report/{id}').onUpdate(async (change, context) => {
+    // Get the parameter `{id}` representing the daily report document id
+    const id = parseInt(context.params.id);
 
-    // Publish to Pub/Sub
-    try {
-        const messageId = await pubSubClient.topic(topicName).publish(messageBuffer);
-        console.log(`Message ${topicName} - ${messageId} published.`);
-    } catch (error) {
-        console.error(`Received error while publishing: ${topicName} - ${error.message}`);
+    // Get the parameter `{userId}` representing the self report document id
+    const userId = context.params.userId;
+
+    // Get the new data updated
+    const newValue = change.after.data();
+    console.log(`Self Report Updated: ${userId}, ${id}, ${newValue}`);
+
+    // Get user data
+    const userRef = admin.firestore()
+        .collection('users')
+        .doc(userId);
+
+    const userData = (await userRef.get()).data();
+
+    // Prepare pub/sub message data
+    const pubData = {
+        report_id: id,
+        user_id: userId,
+        action: "edit",
+        created_at: newValue.created_at,
+        body_temp: newValue.body_temperature,
+        symptoms: parseSymptoms(newValue.indications),
+        location: newValue.location,
+        user: userData,
+    };
+
+    const result = publishMessageTopic(pubData);
+
+    if (result === false) {
         return 'error';
     }
 
@@ -66,4 +90,28 @@ function parseSymptoms(input) {
     }
     
     return symptomsArray;
+}
+
+async function publishMessageTopic(payload) {
+    // Init Pub/Sub client
+    const pubSubClient = new PubSub();
+
+    // Pub/Sub topic
+    const topicName = functions.config().env.self_report.pubsub_topic;
+
+    // Convert message data to json string
+    messageJsonString = JSON.stringify(payload);
+    const messageBuffer = Buffer.from(messageJsonString);
+
+    console.log(`Self Report Pub/Sub message data: ${messageJsonString}`);
+
+    // Publish to Pub/Sub
+    try {
+        const messageId = await pubSubClient.topic(topicName).publish(messageBuffer);
+        console.log(`Message ${topicName} - ${messageId} published.`);
+        return true;
+    } catch (error) {
+        console.error(`Received error while publishing: ${topicName} - ${error.message}`);
+        return false;
+    }
 }

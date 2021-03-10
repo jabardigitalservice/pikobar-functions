@@ -182,6 +182,7 @@ exports.updateStatistics = updateStatistics.updateStatistics;
 // Self Report Pub/Sub
 exports.selfReportTestPubSub = selfReportMain.testPubSub;
 exports.selfReportCreatedPubsub = selfReportMain.selfReportCreatedPubsub;
+exports.selfReportUpdatedPubsub = selfReportMain.selfReportUpdatedPubsub;
 
 exports.selfReportManageSubscriptions = selfReport.selfReportManageSubscriptions;
 exports.selfReportAutoUnsubscribe = selfReport.selfReportAutoUnsubscribe;
