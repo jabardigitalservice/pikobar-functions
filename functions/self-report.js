@@ -2,29 +2,6 @@ const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const { PubSub } = require('@google-cloud/pubsub');
 
-
-exports.testPubSub = functions.https.onRequest(async (request, response) => {
-    // Init Pub/Sub client
-    const pubSubClient = new PubSub();
-
-    // Pub/Sub topic
-    const topicName = functions.config().env.self_report.pubsub_topic;
-
-    // Convert message data to json string
-    messageData = JSON.stringify({foo: 'bar'});
-    const messageDataBuffer = Buffer.from(messageData);
-
-    try {
-        const messageId = await pubSubClient.topic(topicName).publish(messageDataBuffer);
-        console.log(`Message ${topicName} - ${messageId} published.`);
-    } catch (error) {
-        console.error(`Received error while publishing: ${topicName} - ${error.message}`);
-        return response.status(500).send("Error.");
-    }
-
-    return response.send("OK.");
-});
-
 exports.selfReportCreatedPubsub = functions.firestore.document('self_reports/{userId}/daily_report/{id}').onCreate(async (snap, context) => {
     // Get the parameter `{id}` representing the daily report document id
     const id = parseInt(context.params.id);
@@ -50,7 +27,7 @@ exports.selfReportCreatedPubsub = functions.firestore.document('self_reports/{us
         action: "create",
         created_at: newValue.created_at,
         body_temp: newValue.body_temperature,
-        symptoms: newValue.indications,
+        symptoms: parseSymptoms(newValue.indications),
         location: newValue.location,
         user: userData,
     };
@@ -78,3 +55,15 @@ exports.selfReportCreatedPubsub = functions.firestore.document('self_reports/{us
 
     return 'ok';
 });
+
+function parseSymptoms(input) {
+    var symptomsArray = [];
+
+    if (typeof input !== 'undefined' && input !== null && input !== '') {
+        const regexp = /\w+( +\w+)*/g;
+
+        symptomsArray = input.match(regexp);
+    }
+    
+    return symptomsArray;
+}
