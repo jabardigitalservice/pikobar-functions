@@ -22,6 +22,7 @@ exports.selfReportCreatedPubsub = functions.firestore.document('self_reports/{us
 
     // Prepare pub/sub message data
     const pubData = {
+        type: "SELF_REPORT",
         report_id: id,
         user_id: userId,
         action: "create",
@@ -61,6 +62,7 @@ exports.selfReportUpdatedPubsub = functions.firestore.document('self_reports/{us
 
     // Prepare pub/sub message data
     const pubData = {
+        type: "SELF_REPORT",
         report_id: id,
         user_id: userId,
         action: "edit",
@@ -102,7 +104,8 @@ exports.selfOtherReportCreatedPubsub = functions.firestore.document('self_report
 
     // Get the new data created
     const newValue = snap.data();
-    console.log(`Self Other Report Created: ${userId}, ${personId}, ${id}, ${newValue}`);
+    console.log(`Self Other Report Created: ${userId}, ${personId}, ${id}`);
+    console.log(JSON.stringify(newValue));
 
     // Get user data
     const userRef = admin.firestore()
@@ -111,8 +114,16 @@ exports.selfOtherReportCreatedPubsub = functions.firestore.document('self_report
 
     const userData = (await userRef.get()).data();
 
+    // Get Other Person Data
+    const personRef = admin.firestore()
+        .collection(`self_reports/${userId}/other_report`)
+        .doc(personId);
+
+    const personData = (await personRef.get()).data();
+
     // Prepare pub/sub message data
-    const pubData = {
+    let pubData = {
+        type: "OTHER_REPORT",
         report_id: id,
         user_id: userId,
         action: "create",
@@ -123,14 +134,19 @@ exports.selfOtherReportCreatedPubsub = functions.firestore.document('self_report
         user: userData,
     };
 
-    messageJsonString = JSON.stringify(pubData);
-    console.log(messageJsonString);
+    pubData.user.name = personData.name;
+    pubData.user.nik = personData.nik;
 
-    // const result = publishMessageTopic(pubData);
+    let messageJsonString = JSON.stringify(pubData);
+    let personJsonString = JSON.stringify(personData);
 
-    // if (result === false) {
-    //     return 'error';
-    // }
+    console.log(messageJsonString, personJsonString);
+
+    const result = publishMessageTopic(pubData);
+
+    if (result === false) {
+        return 'error';
+    }
 
     return 'ok';
 });
@@ -144,8 +160,51 @@ exports.selfOtherReportUpdatedPubsub = functions.firestore.document('self_report
     const personId = context.params.personId;
 
     // Get the new data created
-    // const newValue = snap.data();
-    console.log(`Self Other Report Updated: ${userId}, ${personId}, ${id}, ${newValue}`);
+    const newValue = change.after.data();
+
+    console.log(`Self Other Report Updated: ${userId}, ${personId}, ${id}`);
+    console.log(JSON.stringify(newValue));
+
+    // Get user data
+    const userRef = admin.firestore()
+        .collection('users')
+        .doc(userId);
+
+    const userData = (await userRef.get()).data();
+
+    // Get Other Person Data
+    const personRef = admin.firestore()
+        .collection(`self_reports/${userId}/other_report`)
+        .doc(personId);
+
+    const personData = (await personRef.get()).data();
+
+    // Prepare pub/sub message data
+    let pubData = {
+        type: "OTHER_REPORT",
+        report_id: id,
+        user_id: userId,
+        action: "edit",
+        created_at: newValue.created_at,
+        body_temp: newValue.body_temperature,
+        symptoms: parseSymptoms(newValue.indications),
+        location: newValue.location,
+        user: userData,
+    };
+
+    pubData.user.name = personData.name;
+    pubData.user.nik = personData.nik;
+
+    let messageJsonString = JSON.stringify(pubData);
+    let personJsonString = JSON.stringify(personData);
+
+    console.log(messageJsonString, personJsonString);
+
+    const result = publishMessageTopic(pubData);
+
+    if (result === false) {
+        return 'error';
+    }
 
     return 'ok';
 });
