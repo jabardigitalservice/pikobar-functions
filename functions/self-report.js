@@ -92,6 +92,64 @@ function parseSymptoms(input) {
     return symptomsArray;
 }
 
+exports.selfOtherReportCreatedPubsub = functions.firestore.document('self_reports/{userId}/other_report/{personId}/daily_report/{id}').onCreate(async (snap, context) => {
+    // Get the parameter `{id}` representing the daily report document id
+    const id = parseInt(context.params.id);
+
+    // Get the parameter `{userId}` representing the self report document id
+    const userId = context.params.userId;
+    const personId = context.params.personId;
+
+    // Get the new data created
+    const newValue = snap.data();
+    console.log(`Self Other Report Created: ${userId}, ${personId}, ${id}, ${newValue}`);
+
+    // Get user data
+    const userRef = admin.firestore()
+        .collection('users')
+        .doc(userId);
+
+    const userData = (await userRef.get()).data();
+
+    // Prepare pub/sub message data
+    const pubData = {
+        report_id: id,
+        user_id: userId,
+        action: "create",
+        created_at: newValue.created_at,
+        body_temp: newValue.body_temperature,
+        symptoms: parseSymptoms(newValue.indications),
+        location: newValue.location,
+        user: userData,
+    };
+
+    messageJsonString = JSON.stringify(pubData);
+    console.log(messageJsonString);
+
+    // const result = publishMessageTopic(pubData);
+
+    // if (result === false) {
+    //     return 'error';
+    // }
+
+    return 'ok';
+});
+
+exports.selfOtherReportUpdatedPubsub = functions.firestore.document('self_reports/{userId}/other_report/{personId}/daily_report/{id}').onUpdate(async (change, context) => {
+    // Get the parameter `{id}` representing the daily report document id
+    const id = parseInt(context.params.id);
+
+    // Get the parameter `{userId}` representing the self report document id
+    const userId = context.params.userId;
+    const personId = context.params.personId;
+
+    // Get the new data created
+    // const newValue = snap.data();
+    console.log(`Self Other Report Updated: ${userId}, ${personId}, ${id}, ${newValue}`);
+
+    return 'ok';
+});
+
 async function publishMessageTopic(payload) {
     // Init Pub/Sub client
     const pubSubClient = new PubSub();

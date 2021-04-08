@@ -180,9 +180,13 @@ exports.updateProfileTracking = functions.firestore.document('users/{userId}').o
 exports.updateStatistics = updateStatistics.updateStatistics;
 
 // Self Report Pub/Sub
-exports.selfReportTestPubSub = selfReportMain.testPubSub;
 exports.selfReportCreatedPubsub = selfReportMain.selfReportCreatedPubsub;
 exports.selfReportUpdatedPubsub = selfReportMain.selfReportUpdatedPubsub;
+
+// Other Report Pub/Sub
+exports.selfOtherReportCreatedPubsub = selfReportMain.selfOtherReportCreatedPubsub;
+exports.selfOtherReportUpdatedPubsub = selfReportMain.selfOtherReportUpdatedPubsub;
+
 
 exports.selfReportManageSubscriptions = selfReport.selfReportManageSubscriptions;
 exports.selfReportAutoUnsubscribe = selfReport.selfReportAutoUnsubscribe;
