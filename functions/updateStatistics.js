@@ -134,11 +134,11 @@ function updateStatistics(statistics, pcr, rdt, pcr_individu, rdt_antigen) {
 
     admin.firestore()
         .collection('statistics')
-        .doc('rdt_antigen')
+        .doc('rdt-antigen')
         .set(rdt_antigen, { merge: true });
 
     admin.firestore()
         .collection('statistics')
-        .doc('pcr_individu')
+        .doc('pcr-orang-kasus-baru')
         .set(pcr_individu, { merge: true });
 }
