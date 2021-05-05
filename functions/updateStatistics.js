@@ -34,9 +34,24 @@ exports.updateStatistics =
                 'total': null
             }
 
+            let pcr_individu = {
+                'last_update': null,
+                'invalid': null,
+                'negatif': null,
+                'positif': null,
+                'total': null
+            }
+
             let rdt = {
                 'last_update': null,
                 'invalid': null,
+                'negatif': null,
+                'positif': null,
+                'total': null
+            }
+
+            let rdt_antigen = {
+                'last_update': null,
                 'negatif': null,
                 'positif': null,
                 'total': null
@@ -47,9 +62,14 @@ exports.updateStatistics =
             // const last_update = new Date(data['metadata']['last_update']);
             const pcr_update = new Date(field['pcr_date']);
             const rdt_update = new Date(field['rdt_tanggal']);
+            const rdt_antigen_update = new Date(field['antigen_tanggal']);
+            const pcr_individu_update = new Date(field['pcr_individu_date']);
             const formated_last_update = admin.firestore.Timestamp.now();
             const formated_pcr_update = admin.firestore.Timestamp.fromDate(pcr_update);
             const formated_rdt_update = admin.firestore.Timestamp.fromDate(rdt_update);
+            const formated_rdt_antigen_update = admin.firestore.Timestamp.fromDate(rdt_antigen_update);
+            const formated_pcr_individu_update = admin.firestore.Timestamp.fromDate(pcr_individu_update);
+
 
 
             // jawabarat
@@ -80,10 +100,23 @@ exports.updateStatistics =
             rdt['total'] = field['rdt_total']
             rdt['last_update'] = formated_rdt_update;
 
-            updateStatistics(statistics, pcr, rdt);
+            //pcr individu
+            pcr_individu['invalid'] = field['pcr_individu_invalid']
+            pcr_individu['negatif'] = field['pcr_individu_negatif']
+            pcr_individu['positif'] = field['pcr_individu_positif']
+            pcr_individu['total'] = field['pcr_individu_total']
+            pcr_individu['last_update'] = formated_pcr_individu_update;
+
+            // rdt antigen
+            rdt_antigen['negatif'] = field['antigen_negatif']
+            rdt_antigen['positif'] = field['antigen_positif']
+            rdt_antigen['total'] = field['antigen_total']
+            rdt_antigen['last_update'] = formated_rdt_antigen_update;
+
+            updateStatistics(statistics, pcr, rdt, pcr_individu, rdt_antigen);
         });
 
-function updateStatistics(statistics, pcr, rdt) {
+function updateStatistics(statistics, pcr, rdt, pcr_individu, rdt_antigen) {
     admin.firestore()
         .collection('statistics')
         .doc('jabar-dan-nasional')
@@ -98,4 +131,14 @@ function updateStatistics(statistics, pcr, rdt) {
         .collection('statistics')
         .doc('rdt')
         .set(rdt, { merge: true });
+
+    admin.firestore()
+        .collection('statistics')
+        .doc('rdt-antigen')
+        .set(rdt_antigen, { merge: true });
+
+    admin.firestore()
+        .collection('statistics')
+        .doc('pcr-orang-kasus-baru')
+        .set(pcr_individu, { merge: true });
 }
